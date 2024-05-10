@@ -5,9 +5,12 @@ spring:
     openai:
       # your openai key
       api-key: ${My_openAi_Key}
-      # choose your model
-      engine-id: gpt-3.5-turbo
       # base url
       base-url: https://api.openai.com/
+      # settings for chat api
+      chat:
+        options:
+          temperature: 0.5 # 0.0 to 1.0 (higher is more creative)
+          model: gpt-3.5-turbo # gpt-3.5-turbo or gpt-4-32k
 
 
