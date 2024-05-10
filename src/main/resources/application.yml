@@ -1,0 +1,14 @@
+spring:
+  application:
+  name: SpringAi
+  ai:
+    openai:
+      # ???????????openai key
+      api-key: ${My_openAi_Key}
+      # ???????
+      engine-id: gpt-4
+      # ??url
+      base-url: https://api.openai.com/
+
+
+
