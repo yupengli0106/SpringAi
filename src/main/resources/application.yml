@@ -3,12 +3,11 @@ spring:
   name: SpringAi
   ai:
     openai:
-      # ???????????openai key
+      # your openai key
       api-key: ${My_openAi_Key}
-      # ???????
-      engine-id: gpt-4
-      # ??url
+      # choose your model
+      engine-id: gpt-3.5-turbo
+      # base url
       base-url: https://api.openai.com/
-
 
 
