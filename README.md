@@ -74,6 +74,8 @@
 
 ## application.yml文件配置
 
+在启动项目之前openai key必须要配置好，不然会报错
+
 ```yaml
 spring:
   application:
@@ -90,7 +92,7 @@ spring:
 
 
 
-## Ai文字聊天Controller
+## Ai文字聊天
 
 AiChatController: 使用SpringAi为我们注入的 **OpenAiChatClient** 去进行聊天
 
@@ -126,6 +128,63 @@ public class AiChatController {
         return response;
     }
 
+}
+```
+
+
+
+## Ai图片生成
+
+图片生成模型的配置（application.yml）：
+
+```yaml
+spring:
+  application:
+  name: SpringAi
+  
+  ai:
+    openai:
+      # your openai key
+      api-key: ${My_openAi_Key}
+      # base url
+      base-url: https://api.openai.com/
+      
+      # settings for image generation api
+        image:
+            options:
+            model: gpt-4-dalle
+            height: 1024
+            width: 1024
+            quality: hd #the resolution of the image
+```
+
+
+
+AiImageController: 这里会根据用户的输入要求，返回一个绘制好的图片的URL，我们需要点击这个链接才能看到图片。在实际的应用中我们可能需要对图片做另外的处理，而不是仅仅显示一个链接。
+
+```java
+@RestController
+public class AiImageController {
+  
+    @Resource
+    private OpenAiImageClient openAiImageClient;
+
+    /**
+     * Generate image based on the user input
+     * @param message message from user
+     * @return image URL
+     */
+    @RequestMapping("/image")
+    public String image(@RequestParam("msg") String message){
+        ImageResponse imageResponse = openAiImageClient.call(new ImagePrompt(message));
+        System.out.println(imageResponse);
+
+        // 获得图片的URL，点击链接查看图片
+        String imageUrl = imageResponse.getResult().getOutput().getUrl();
+        //TODO: 对图片进行处理
+
+        return imageUrl;
+    }
 }
 ```
 
