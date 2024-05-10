@@ -12,18 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
  * @Description:
  */
 @RestController
-public class AiChat {
+public class AiChatController {
     @Resource
     private OpenAiChatClient openAiChatClient;
 
 
-//    http://localhost:8080/chat?msg=hello
+    /**
+     * Chat with AI
+     * @param message message from user
+     * @return response message from AI
+     * we can send a request to http://localhost:8080/chat?msg=hello
+     * then we will get a response from AI
+     */
     @RequestMapping("/chat")
     public String chat(@RequestParam("msg") String message) {
         String response = openAiChatClient.call(message);
         return response;
     }
-
-
 
 }
