@@ -319,3 +319,48 @@ public class FileUtil {
 }
 ```
 
+
+
+## SpringAi多模态
+
+前面我们都是每个功能对应一个API比如chat api我只能聊天，image api我只能生成图片，这些就被称为**单模态API**。那么有没有一种API就是我**既可以让AI跟我聊天也可以让它给我生成图片，同时还是让他给我做翻译**的功能呢？这就是我们这里所要介绍的**多模态API了**！
+
+```java
+@RestController
+public class Multimodality {
+  
+    @Resource
+    private ChatClient chatClient;
+
+    /**
+     * Multimodality
+     * @param message message from user
+     * @param imageUrl image URL from user
+     * @return response message from AI
+     * 根据用户输入的文本和图片生成回复：
+     * http://localhost:8080/multimodality?msg=描述这个图片并且用英文翻译给我&&url=https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9FUOcSsrbLPB9Sx5skzfzWuy-Cdjj6Wo0z4fWbxlyIqp7uN0SQdojaZY7dqTd97qPZQ&usqp=CAU
+     */
+    @RequestMapping("/multimodality")
+    public Object multimodality(@RequestParam("msg") String message, @RequestParam("url") String imageUrl) {
+        UserMessage userMessage = new UserMessage(message,
+                List.of(new Media(MimeTypeUtils.IMAGE_PNG, imageUrl))
+        );
+
+        //基础调用方式
+        //chatClient.call(userMessage);
+
+        //通过Prompt的方式调用，可以指定模型，这里指定为GPT-4 Vision Preview
+        ChatResponse response = chatClient.call(new Prompt(userMessage, OpenAiChatOptions.builder()
+                .withModel(OpenAiApi.ChatModel.GPT_4_VISION_PREVIEW.getValue())
+                .build())
+        );
+
+        // 返回AI的回复
+        return response.getResult().getOutput().getContent();
+    }
+  
+}
+```
+
+
+
