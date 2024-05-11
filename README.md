@@ -1,4 +1,4 @@
-# SpringAi
+<h1 style="text-align: center;">SpringAi</h1>
 
 ## 前期准备
 
@@ -443,7 +443,7 @@ public class OllamaController {
 
 
 
-停止运行Ollama(Mac)
+停止运行Ollama(Mac)：如果有ui application直接点击quit就行，不然可以用cmd，如下：
 
 **找到**的进程：
 
@@ -457,3 +457,64 @@ ps aux | grep ollama
 kill -9 <PID>
 ```
 
+
+
+
+
+## Open WebUI
+
+Open WebUI 比较成熟流行的UI界面这里是他们的[GitHub安装教程](https://github.com/open-webui/open-webui)，但是感觉没有Lobe的看起来舒服好用。这里我就不用这个了，感兴趣的自己可以去GitHub看看。  
+
+
+
+
+
+## Lobe Chat
+
+这个新的UI看起来内容丰富一点，还支持中文，[GitHub官方教程](https://github.com/lobehub/lobe-chat)。
+
+1. 在你的电脑上下载Docker
+2. 运行指令：(可能遇到换行符\没用的情况，就手动改成一行去掉换行符就行 )
+
+```dockerfile
+$ docker run -d -p 3210:3210 \ 
+  -e OPENAI_API_KEY=sk-xxxx \
+  -e OPENAI_PROXY_URL=https://api-proxy.com/v1 \
+  -e ACCESS_CODE=lobe66 \
+  --name lobe-chat \
+  lobehub/lobe-chat
+```
+
+```dockerfile
+docker run -d -p 3210:3210 -e OPENAI_API_KEY=sk-xxxx -e OPENAI_PROXY_URL=https://api-proxy.com/v1 -e ACCESS_CODE=lobe66 --name lobe-chat lobehub/lobe-chat
+```
+
+解释：
+
+```dockerfile
+-d # 后台运行
+-p 3210:3210 #把主机(本机)端口和docker容器端口映射
+-e OPENAI_API_KEY=sk-xxxx # 环境变量openAi key 可以先不设置随便写
+-e OPENAI_PROXY_URL=https://api-proxy.com/v1  # 代理端口如果用VPN的话要配置
+-e ACCESS_CODE=lobe66 # 环境变量随便写个
+--name lobe-chat #容器起个名字
+lobehub/lobe-chat #镜像名字 不能错
+```
+
+3. 运行完毕后直接访问`localhost:3210` 就直接进入聊天界面了（第一次安装可能会花点时间拉取镜像）
+
+
+
+**注意：**
+
++ 在选取本地模型的时候**确保你的Ollama是处于运行中**的，如果没运行会报错。
+
++ 如果Ollama运行中但是所选取的模型没有本地部署Lobe chat会自动提示你下载。
+
++ 如果选取OpenAi的GPT模型也会弹出提示，输入我们的API key就行了。
+
+
+
+聊天界面：
+
+![Lobe](images/Lobe.png)
