@@ -441,3 +441,19 @@ public class OllamaController {
 
 ![ollama](images/ollama.png)
 
+
+
+停止运行Ollama(Mac)
+
+**找到**的进程：
+
+```bash
+ps aux | grep ollama
+```
+
+**终止**进程：
+
+```bash
+kill -9 <PID>
+```
+
