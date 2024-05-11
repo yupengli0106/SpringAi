@@ -364,3 +364,80 @@ public class Multimodality {
 
 
 
+## Ollama本地模型部署
+
+除了使用OpenAi的API去进行ai的对话方式外，我们也可以通过在本地部署开源模型，这样就不需要api key和网络也可以使用Ai模型去对话了。
+
+这里我们借助Ollama平台去一键获取和在本地部署模型
+
+1. 下载Ollama： [Ollama](https://ollama.com/download/)
+
+2. [在这里](https://ollama.com/library)选择我们想要的模型，这里我就选择llama3模型大概4GB, 然后在终端根据指令 `ollama run llama3` 进行安装
+
+3. 模型拉取完成后我们就可以跟AI进行对话了，注意这里模型部署可能会需要一定的CPU和GPU一不小心电脑内存就裂开了🤣
+
+
+
+## SpringAi-Ollama
+
+上面我们部署好了本地模型之后我们就可以去通过SpringAi去集成了，我重新创建了一个项目然后压缩成了SpringAI-Ollama.**zip**文件，可以单独下载这个zip文件然后跑起来去测试。
+
+1. 跟之前创建SpringBoot项目，但是这里要注意在最后选择SpringAi的时候**要选择Ollama而不是之前的OpenAi了**
+2. 项目创建好了之后，我们可以吧之前的pom.xml文件给直接复制过来，继续使用SpringAi 1.0.0-SNAPSHOT版本。
+
+**这里有一个非常重要的点我们的starter需要改变不再是SpringAi starter了而是下面的spring-ai-ollama-start：**
+
+```xml
+<dependency>
+	<groupId>org.springframework.ai</groupId>
+	<artifactId>spring-ai-ollama-spring-boot-starter</artifactId></dependency>
+```
+
+3. 修改我们的application.yml文件：
+
+   + 将之前的openai改为ollama
+
+   + base_url改为ollama运行的本地端口11414
+
+   + 指定chat模型，目前我们只部署了llama3模型所以只能指定这个模型
+
+application.yml:
+
+```yaml
+spring:
+  application:
+    name: SpringAI-Ollama
+
+  ai:
+    ollama:
+      # 这里是默认的ollama运行端口
+      base-url: http://localhost:11434
+      chat:
+        # 这里是指定我们在ollama中所存在的模型，我们目前只下载了llama3这个模型
+        model: llama3
+```
+
+
+
+Controller:
+
+```java
+@RestController
+public class OllamaController {
+
+    @Resource
+    private OllamaChatClient ollamaChatClient;
+
+    @RequestMapping("/ollama")
+    public String ollama(@RequestParam("msg") String message) {
+        String response = ollamaChatClient.call(message);
+        return response;
+    }
+
+}
+```
+
+这里我测试这个controller的时候电脑内存直接飙升跑满了，我只有8GB的内存太卡啦🤣
+
+![ollama](images/ollama.png)
+
