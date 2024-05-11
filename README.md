@@ -1,4 +1,4 @@
-<h1 style="text-align: center;">SpringAi</h1>
+<h1 align="center">SpringAi</h1>
 
 ## 前期准备
 
