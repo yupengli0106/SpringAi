@@ -188,3 +188,134 @@ public class AiImageController {
 }
 ```
 
+
+
+## Ai音频转文字
+
+这里就没有写配置了，直接使用api默认调用的audio-to-text 模型。
+
+```java
+@RestController
+public class AiTranscriptionController {
+
+    @Resource
+    private OpenAiAudioTranscriptionClient openAiAudioTranscriptionClient;
+
+    /**
+     * Transcribe audio to text
+     * @param audioUrl audio URL from user
+     * @return transcript text from audio
+     */
+    @RequestMapping("/transcription")
+    public Object transcription(@RequestParam("url") String audioUrl) {
+        if (Objects.isNull(audioUrl)) {
+            return "Please provide audio URL";
+        }
+        // 获取音频作为资源，然后传给OpenAiAudioTranscriptionClient 进行转换
+        // 这里是获取的本地音频文件(FileSystemResource)，后期可以改成从网络获取或者class path获取
+        org.springframework.core.io.Resource audioFile = new FileSystemResource(audioUrl);
+
+        // 获取音频转换后的文本
+        String transcriptText = openAiAudioTranscriptionClient.call(audioFile);
+        return transcriptText;
+    }
+}
+```
+
+
+
+## Ai文字转音频
+
+跟之前的请求一样这里还是根据用户输入的文字然后通过openai的OpenAiAudioSpeechClient去转换成音频文件。
+
+但是这里需要注意的是最终返回的结果是一个byte[]数组，并不是一个直接的音频文件，因为我们还需要自己编写一个工具类去吧byte[]数组写成文件的格式然后保存起来。
+
+```java
+@RestController
+public class AiTranscriptionController {
+
+    @Resource
+    private OpenAiAudioSpeechClient openAiAudioSpeechClient;
+
+    /**
+     * Convert text to speech
+     * @param message message from user
+     * @return text to speech successfully
+     * @throws IOException if I/O error occurs
+     * 文本转换成MP3格式的音频保存在audio文件夹下
+     */
+    @RequestMapping("/speech")
+    public Object speech(@RequestParam("msg") String message) throws IOException {
+        if (Objects.isNull(message)) {
+            return "Please provide message";
+        }
+
+        // 文字转语音，返回的是字节数组!
+        byte[] audio = openAiAudioSpeechClient.call(message);
+
+        // 通过工具类把字节数组转成音频文件，保存到audio文件夹下
+        try {
+            FileUtil.writeBytesToMp3File("audio", audio);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "Text to speech successfully!";
+    }
+}
+```
+
+工具类FileUtil：
+
+```java
+public class FileUtil {
+    /**
+     * 将字节数组写入到指定路径的 .mp3 文件中，确保文件名不重复
+     *
+     * @param directory 目标目录路径
+     * @param data      字节数组数据
+     * @return 生成的文件名
+     * @throws IOException 如果发生 I/O 错误
+     */
+    public static String writeBytesToMp3File(String directory, byte[] data) throws IOException {
+        String fileName = generateUniqueFileName(directory, "mp3");
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(new File(directory, fileName));
+            fos.write(data);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return fileName;
+    }
+
+    /**
+     * 生成唯一的文件名
+     *
+     * @param directory 目标目录路径
+     * @param extension 文件扩展名
+     * @return 唯一的文件名
+     */
+    private static String generateUniqueFileName(String directory, String extension) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String uniqueID = UUID.randomUUID().toString().substring(0, 8);
+        String fileName = "audio_" + timeStamp + "_" + uniqueID + "." + extension;
+
+        File file = new File(directory, fileName);
+        while (file.exists()) {
+            uniqueID = UUID.randomUUID().toString().substring(0, 8);
+            fileName = "audio_" + timeStamp + "_" + uniqueID + "." + extension;
+            file = new File(directory, fileName);
+        }
+        return fileName;
+    }
+
+}
+```
+
