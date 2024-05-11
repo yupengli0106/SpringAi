@@ -8,7 +8,7 @@
 4. jdk 17+
 5. 在创建项目的时候勾选SpringWeb和**SpringAi**(在最下面) 
 
-
+Reference: [动力节点SpringAi视频课程](https://www.bilibili.com/video/BV1d1421d7Fy?p=1&vd_source=8e2358f9b27440129acde1350d40c3cb)
 
 ## SpringAi 依赖拉取失败解决方案
 
