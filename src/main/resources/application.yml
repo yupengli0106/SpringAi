@@ -18,7 +18,7 @@ spring:
       # settings for image generation api
         image:
             options:
-            model: gpt-4-dalle
+            model: gpt-4o
             height: 1024
             width: 1024
             quality: hd #the resolution of the image
